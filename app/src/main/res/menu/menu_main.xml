@@ -1,0 +1,13 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android" >
+    <item android:id="@+id/action_filter"
+        android:icon="@drawable/ic_filter_list_white_36dp"
+        android:title="@string/action_filter"
+        android:showAsAction="ifRoom" />
+    <item android:id="@+id/action_sort"
+        android:title="@string/action_sort"
+        android:icon="@drawable/ic_sort_white_36dp"
+        android:showAsAction="ifRoom" />
+    <item android:id="@+id/action_signout"
+        android:title="@string/action_signout"
+        android:showAsAction="ifRoom" />
+</menu>
