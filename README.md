@@ -1,2 +1,0 @@
-# Placement
-Placement notification app
