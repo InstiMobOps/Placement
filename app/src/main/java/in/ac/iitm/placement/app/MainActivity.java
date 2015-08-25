@@ -185,10 +185,7 @@ public class MainActivity extends AppCompatActivity implements AppBarLayout.OnOf
                     .build());
             return true;
         } else if (id == R.id.action_filter) {
-            mTracker.send(new HitBuilders.EventBuilder()
-                    .setCategory("Action_bar_button")
-                    .setAction("filter")
-                    .build());
+
 
             return true;
         } else if (id == R.id.action_signout) {
