@@ -102,7 +102,7 @@
         android:textAppearance="?android:attr/textAppearanceLarge"
         android:text="IIT Madras"
         android:textColor="#F5D731"
-        android:layout_marginRight="62dp"
+        android:layout_marginRight="60dp"
         android:id="@+id/textView2"
         android:layout_below="@+id/textView"
         android:layout_alignParentRight="true"
