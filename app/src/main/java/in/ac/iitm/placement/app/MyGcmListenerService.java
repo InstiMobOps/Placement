@@ -52,8 +52,9 @@ public class MyGcmListenerService extends GcmListenerService {
          * In some cases it may be useful to show a notification indicating to the user
          * that a message was received.
          */
+        sendNotification(message);
+
         if(Utils.getprefBool("logedin", getBaseContext())){
-            sendNotification(message);
         }
     }
     // [END receive_message]

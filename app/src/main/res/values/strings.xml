@@ -10,6 +10,5 @@
 
     <string name="title_activity_filter_dialoge">FilterDialoge</string>
     <string name="dummy">You may need a Google Account in order to use some of our Services. You may create your own Google Account, or your Google Account may be assigned to you by an administrator, such as your employer or educational institution. If you are using a Google Account assigned to you by an administrator, different or additional terms may apply and your administrator may be able to access or disable your account</string>
-    <string name="gcm_defaultSenderId">826443059398</string>
     <string name="dominename">http://10.24.0.224/placement/login/</string>
 </resources>
