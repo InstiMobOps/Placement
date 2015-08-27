@@ -46,8 +46,10 @@ import org.json.JSONObject;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
+import java.util.List;
 
 import me.leolin.shortcutbadger.ShortcutBadger;
 
@@ -185,8 +187,11 @@ public class MainActivity extends AppCompatActivity implements AppBarLayout.OnOf
                     .build());
             return true;
         } else if (id == R.id.action_filter) {
-
-
+            showFilterDialog();
+            mTracker.send(new HitBuilders.EventBuilder()
+                    .setCategory("Action_bar_button")
+                    .setAction("Filter")
+                    .build());
             return true;
         } else if (id == R.id.action_signout) {
             mTracker.send(new HitBuilders.EventBuilder()
@@ -204,6 +209,94 @@ public class MainActivity extends AppCompatActivity implements AppBarLayout.OnOf
 
         return super.onOptionsItemSelected(item);
     }
+
+    private void showFilterDialog() {
+        new AlertDialog.Builder(this)
+                .setTitle("Filter By")
+                .setSingleChoiceItems(new String[]{"Company", "Event"}, 0, null)
+                .setPositiveButton("ok", new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int whichButton) {
+
+                                final int selectedPosition = ((AlertDialog) dialog).getListView().getCheckedItemPosition();
+                                ArrayList<String> filterList = Filter(selectedPosition);
+                                String[] stockArr = new String[filterList.size()];
+                                stockArr = filterList.toArray(stockArr);
+                                dialog.dismiss();
+                                final String[] finalStockArr = stockArr;
+                                String dialogName;
+                                if(selectedPosition==0){
+                                    dialogName="Choose Company";
+                                }else{
+                                    dialogName="Choose Event";
+                                }
+                                new AlertDialog.Builder(MainActivity.this)
+                                        .setTitle(dialogName)
+                                        .setSingleChoiceItems(stockArr, 0, null)
+                                        .setPositiveButton("ok", new DialogInterface.OnClickListener() {
+                                                    public void onClick(DialogInterface dialog, int whichButton) {
+                                                        ArrayList<Event> secondList = new ArrayList<Event>();
+                                                        int secondPosition = ((AlertDialog) dialog).getListView().getCheckedItemPosition();
+                                                        if (selectedPosition == 0) {
+                                                            for (Event a : arrayList) {
+                                                                if (a.getName().equals(finalStockArr[secondPosition])) {
+                                                                    secondList.add(a);
+                                                                }
+                                                            }
+                                                        } else if (selectedPosition == 1) {
+                                                            for (Event a : arrayList) {
+                                                                if (a.getEvent().equals(finalStockArr[secondPosition])) {
+                                                                    secondList.add(a);
+                                                                }
+                                                            }
+                                                        }
+                                                        mAdapter = new AdapterMainActivityRecycler(MainActivity.this, secondList);
+                                                        mRecyclerView.setAdapter(mAdapter);
+                                                        dialog.dismiss();
+                                                    }
+                                                }
+
+                                        )
+                                        .show();
+                            }
+                        }
+
+                )
+
+
+                    .setNegativeButton("cancel", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.dismiss();
+                        }
+                    })
+                .show();
+    }
+
+    private ArrayList Filter(int selectedPosition) {
+        int j=0;
+        ArrayList<String> filterList= new ArrayList<>();
+        switch (selectedPosition){
+            case 0:
+                for(j=0;j<arrayList.size();j++){
+                    String name =arrayList.get(j).getName();
+                    int index = filterList.indexOf(name);
+                    if(index == -1)
+                        filterList.add(name);
+                }
+                break;
+            case 1:
+                for(j=0;j<arrayList.size();j++){
+                    String name =arrayList.get(j).getEvent();
+                    int index = filterList.indexOf(name);
+                    if(index == -1)
+                        filterList.add(name);
+
+                }
+                break;
+        }
+        return filterList;
+    }
+
 
     protected void showSortDialog() {
         // TODO Auto-generated method stub
