@@ -1,111 +1,160 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
-    android:layout_height="match_parent" android:paddingLeft="@dimen/activity_horizontal_margin"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/container"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#193038"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
-    android:paddingBottom="@dimen/activity_vertical_margin" tools:context=".MainActivity"
-    android:background="#193038"
-    android:id="@+id/container">
-<LinearLayout
-    android:orientation="horizontal"
-    android:layout_width="100dp"
-    android:layout_height="100dp"
-    android:background="@drawable/iitm_logo"
-    android:layout_marginLeft="20dp"
-    android:id="@+id/linearLayout"
-    android:layout_marginTop="30dp">
-</LinearLayout>
+    tools:context=".MainActivity">
 
-    <Button
-        android:layout_width="200dp"
-        android:layout_height="60dp"
-        android:text="Login "
+    <LinearLayout
+        android:id="@+id/linearLayout"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:background="@drawable/iitm_logo"
+        android:orientation="horizontal"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:gravity="center_vertical"
+        android:layout_marginTop="20dp"></LinearLayout>
+    <LinearLayout
         android:id="@+id/button"
-        android:background="@drawable/google_login_button"
-        android:adjustViewBounds="true"
+
+        android:layout_width="150dp"
+        android:layout_height="60dp"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentStart="true"
         android:layout_marginBottom="21dp"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
         android:layout_marginLeft="20dp"
         android:layout_marginRight="20dp"
-        android:textColor="#ffff" />
+        android:adjustViewBounds="true"
+        android:background="@drawable/bg_button_fb">
+        <com.balysv.materialripple.MaterialRippleLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+            <LinearLayout android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:id="@+id/gbutton"
+                >
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:src="@drawable/google_plus"
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="10dp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:text="Login With Google"
+            android:textColor="#ffffffff"
+            android:textSize="16dp"
+            android:textIsSelectable="false"
+            android:layout_marginLeft="13dp"
+            />
+            </LinearLayout>
+        </com.balysv.materialripple.MaterialRippleLayout>
+    </LinearLayout>
+
 
     <EditText
+        android:id="@+id/rollno"
+        style="@style/BrowseContentButton"
         android:layout_width="200dp"
         android:layout_height="60dp"
         android:adjustViewBounds="true"
-        android:layout_marginBottom="300dp"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:layout_marginLeft="20dp"
-        android:layout_marginRight="20dp"
-        android:hint="roll no"
         android:background="#ffff"
-        android:paddingLeft="5dp"
-        android:password="true"/>
+        android:hint="roll no"
+        android:paddingLeft="10dp"
+        android:textSize="20dp"
+        android:textStyle="bold"
+        android:layout_above="@+id/password"
+        android:layout_alignRight="@+id/button3"
+        android:layout_alignEnd="@+id/button3"
+        android:layout_alignLeft="@+id/button"
+        android:layout_alignStart="@+id/button"
+        android:layout_marginBottom="5dp" />
 
     <EditText
+        android:id="@+id/password"
+        style="@style/BrowseContentButton"
         android:layout_width="200dp"
         android:layout_height="60dp"
         android:adjustViewBounds="true"
-        android:layout_marginBottom="235dp"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:layout_marginLeft="20dp"
-        android:layout_marginRight="20dp"
         android:background="#ffff"
         android:hint="password"
-        android:paddingLeft="5dp"
-        android:password="true"/>
+        android:paddingLeft="10dp"
+        android:password="true"
+        android:textSize="20dp"
+        android:textStyle="bold"
+        android:layout_above="@+id/button3"
+        android:layout_alignRight="@+id/rollno"
+        android:layout_alignEnd="@+id/rollno"
+        android:layout_alignLeft="@+id/rollno"
+        android:layout_alignStart="@+id/rollno" />
 
-    <Button
+    <com.balysv.materialripple.MaterialRippleLayout
+        android:id="@+id/button3"
         android:layout_width="80dp"
         android:layout_height="40dp"
-        android:adjustViewBounds="true"
-        android:layout_marginBottom="180dp"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentEnd="true"
-        android:layout_marginLeft="20dp"
-        android:layout_marginRight="20dp"
-        android:text="Login"
-        android:background="#3FE07A"
-        android:id="@+id/button3" />
+        android:layout_above="@+id/button"
+        android:layout_alignEnd="@+id/button"
+        android:layout_alignRight="@+id/button"
+        android:layout_marginBottom="35dp"
+        android:layout_marginTop="5dp"
+        app:mrl_rippleBackground="#3FE07A"
+        >
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center_vertical|center_horizontal"
+            android:id="@+id/ldaplogin">
+
+            <TextView
+
+
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:autoText="false"
+                android:foregroundGravity="bottom"
+                android:text="Login"
+                android:textColor="@color/white"
+                android:textIsSelectable="false" />
+        </LinearLayout>
+    </com.balysv.materialripple.MaterialRippleLayout>
+
 
     <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceLarge"
-        android:text="Notification Portal"
-        android:textStyle="bold"
-        android:textColor="#ffff"
         android:id="@+id/textView"
-        android:layout_alignParentTop="true"
-        android:layout_toRightOf="@+id/linearLayout"
-        android:layout_toEndOf="@+id/linearLayout"
-        android:layout_marginLeft="10dp"
-        android:layout_marginTop="45dp"
-        android:textSize="25dp"/>
-
-    <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:text="Placement Notification"
         android:textAppearance="?android:attr/textAppearanceLarge"
-        android:text="IIT Madras"
-        android:textColor="#F5D731"
-        android:layout_marginRight="60dp"
+        android:textColor="#ffff"
+        android:textSize="25dp"
+        android:textStyle="bold"
+        android:layout_below="@+id/textView2"
+        android:layout_centerHorizontal="true" />
+
+    <TextView
         android:id="@+id/textView2"
-        android:layout_below="@+id/textView"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentEnd="true" />
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="IIT Madras"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:textColor="#F5D731"
+        android:layout_below="@+id/linearLayout"
+        android:layout_centerHorizontal="true" />
 
 </RelativeLayout>

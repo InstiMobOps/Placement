@@ -1,6 +1,7 @@
 package in.ac.iitm.placement.app;
 
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.Intent;
 import android.content.IntentSender;
 import android.os.AsyncTask;
@@ -10,9 +11,16 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.View;
-import android.widget.Button;
+import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.ResultCallback;
@@ -33,7 +41,9 @@ import org.apache.http.util.EntityUtils;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 
 public class LoginActivity extends AppCompatActivity implements GoogleApiClient.ConnectionCallbacks,
@@ -44,7 +54,9 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
      * us from starting further intents.
      */
     ProgressDialog progress;
-    Button signin;
+    LinearLayout signin, ldaplogin;
+    EditText username, password;
+
     /* Client used to interact with Google APIs. */
     private GoogleApiClient mGoogleApiClient;
     private boolean mSignInClicked;
@@ -56,10 +68,32 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
         //getSupportActionBar().hide();
-        signin = (Button) findViewById(R.id.button);
-       // container =(RelativeLayout) findViewById(R.id.container);
+        signin = (LinearLayout) findViewById(R.id.gbutton);
+        ldaplogin = (LinearLayout) findViewById(R.id.ldaplogin);
+        username = (EditText) this.findViewById(R.id.rollno);
+        password = (EditText) this.findViewById(R.id.password);
+        // container =(RelativeLayout) findViewById(R.id.container);
         // Button revoke =(Button) findViewById(R.id.revoke);
+        ldaplogin.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(username.getText().toString().trim().length() > 0&&password.getText().toString().trim().length()>0){
+                    if(Utils.isNetworkAvailable(getBaseContext())){
+                        progress = new ProgressDialog(LoginActivity.this);
+                        progress.setCancelable(false);
+                        progress.setMessage("Logging In...");
+                        progress.show();
+                        PlacementLdaplogin(getBaseContext());
+                    }else {
+                        Snackbar.make((RelativeLayout) findViewById(R.id.container), "No network connection", Snackbar.LENGTH_LONG).show();
+                    }
 
+                }else{
+                    Snackbar.make((RelativeLayout) findViewById(R.id.container), "Enter your username and password", Snackbar.LENGTH_LONG).show();
+                }
+
+            }
+        });
         signin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -137,26 +171,25 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
         signin.setEnabled(true);
         mSignInClicked = false;
 
-        String personName = "", personId = "",personEmail="",personRollno="";
+        String personName = "", personId = "", personEmail = "", personRollno = "";
 
         if (Plus.PeopleApi.getCurrentPerson(mGoogleApiClient) != null) {
             Person currentPerson = Plus.PeopleApi
                     .getCurrentPerson(mGoogleApiClient);
             personName = currentPerson.getDisplayName();
             personId = currentPerson.getId();
-            personEmail=Plus.AccountApi.getAccountName(mGoogleApiClient);
+            personEmail = Plus.AccountApi.getAccountName(mGoogleApiClient);
         }
-        if (personEmail.endsWith("smail.iitm.ac.in")){
-            Utils.saveprefString("rollno", personEmail.substring(0,8).toLowerCase(), getBaseContext());
+        if (personEmail.endsWith("smail.iitm.ac.in")) {
+            Utils.saveprefString("rollno", personEmail.substring(0, 8).toLowerCase(), getBaseContext());
             Utils.saveprefString("personname", personName, getBaseContext());
             Utils.saveprefString("personemail", personEmail.toLowerCase(), getBaseContext());
-            Utils.saveprefString("department", personEmail.substring(0,2).toLowerCase(), getBaseContext());
+            Utils.saveprefString("department", personEmail.substring(0, 2).toLowerCase(), getBaseContext());
             Log.d("email", personEmail);
             Log.d("rollno", personEmail.substring(0, 8).toLowerCase());
-            Log.d("rollno", personEmail.substring(0,2).toLowerCase());
-            new  PlacementLogin().execute();
-        }
-        else {
+            Log.d("rollno", personEmail.substring(0, 2).toLowerCase());
+            new PlacementLogin().execute();
+        } else {
             Snackbar.make((RelativeLayout) findViewById(R.id.container), " Account you login with is not smail try again using smail account :)", Snackbar.LENGTH_LONG).show();
             signOutFromGplus();
             signin.setEnabled(true);
@@ -201,9 +234,9 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
             Plus.AccountApi.clearDefaultAccount(mGoogleApiClient);
             mGoogleApiClient.disconnect();
             mGoogleApiClient.connect();
-            Log.d("logout","logout");
+            Log.d("logout", "logout");
         }
-        if (progress!=null) {
+        if (progress != null) {
             progress.dismiss();
 
         }
@@ -224,6 +257,63 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
         }
     }
 
+    private void PlacementLdaplogin(final Context context) {
+        username = (EditText) this.findViewById(R.id.rollno);
+        password = (EditText) this.findViewById(R.id.password);
+        String url = getString(R.string.dominename) + "/mobldaplogin.php";
+        RequestQueue queue = Volley.newRequestQueue(this);
+        Utils.saveprefString("rollno", username.getText().toString().toLowerCase(), getBaseContext());
+        Utils.saveprefString("department", username.getText().toString().substring(0, 2).toLowerCase(), getBaseContext());
+        StringRequest stringRequest = new StringRequest(Request.Method.POST, url,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        String responseBody = response.toString();
+                        responseBody = responseBody.replaceAll("\\s", "");
+                        if (responseBody.equals("1")) {
+                            Log.d("valid login", responseBody + "ok");
+                            Intent downloadIntent;
+                            downloadIntent = new Intent(getBaseContext(), MainActivity.class);
+                            startActivity(downloadIntent);
+                            Utils.saveprefBool("logedin", true, context);
+                            finish();
+                        } else if (responseBody.equals("2")) {
+                            Snackbar.make((RelativeLayout) findViewById(R.id.container), "You have not registered for placement", Snackbar.LENGTH_LONG).show();
+                            Log.d("invalid login", responseBody + "Error connecting to server !!");
+                            Utils.clearpref(context);
+                        } else if (responseBody.equals("3")) {
+                            Snackbar.make((RelativeLayout) findViewById(R.id.container), "Invalid username or password", Snackbar.LENGTH_LONG).show();
+                            Log.d("invalid login", responseBody + "Error connecting to server !!");
+                            Utils.clearpref(context);
+                        } else {
+                            Snackbar.make((RelativeLayout) findViewById(R.id.container), "Error connecting to server !!", Snackbar.LENGTH_SHORT).show();
+                            Log.d("invalid login", responseBody + "Error connecting to server !!");
+                            Utils.clearpref(context);
+                        }
+                        progress.dismiss();
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Snackbar.make((RelativeLayout) findViewById(R.id.container), "Error connecting to server !!", Snackbar.LENGTH_SHORT).show();
+                Log.d("invalid login", error.toString() + "Error connecting to server !!");
+                Utils.clearpref(context);
+                progress.dismiss();
+            }
+        }) {
+
+            @Override
+            protected Map<String, String> getParams() {
+                Map<String, String> params = new HashMap<String, String>();
+                params.put("rollno", username.getText().toString());
+                params.put("password", password.getText().toString());
+                return params;
+            }
+
+        };
+        queue.add(stringRequest);
+    }
+
     private class PlacementLogin extends AsyncTask<String, String, String> {
         String responseBody;
         String token;
@@ -232,7 +322,7 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
         @Override
         protected String doInBackground(String... params) {
             HttpClient httpclient = new DefaultHttpClient();
-            HttpPost httppost = new HttpPost(getString(R.string.dominename)+"/moblogin.php");
+            HttpPost httppost = new HttpPost(getString(R.string.dominename) + "/moblogin.php");
             try {
                 // Add your data
                 List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>(2);
@@ -267,14 +357,13 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
         @Override
         protected void onPostExecute(String s) {
             super.onPostExecute(s);
-            if(responseBody==null){
+            if (responseBody == null) {
                 Snackbar.make((RelativeLayout) findViewById(R.id.container), "Error connecting to server !!", Snackbar.LENGTH_SHORT).show();
                 Log.d("invalid login", responseBody + "ok");
                 signOutFromGplus();
                 Utils.clearpref(getBaseContext());
                 signin.setEnabled(true);
-            }
-            else{
+            } else {
                 responseBody = responseBody.replaceAll("\\s", "");
                 // Toast.makeText(getBaseContext(), "lk" + responseBody + "kh", Toast.LENGTH_SHORT).show();
                 if (responseBody.equals("1")) {
@@ -288,16 +377,14 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
                     //Toast.makeText(getBaseContext(), "lk" + responseBody + "kh", Toast.LENGTH_SHORT).show();
                     finish();
 
-                }
-                else if (responseBody.equals("2")){
+                } else if (responseBody.equals("2")) {
                     Snackbar.make((RelativeLayout) findViewById(R.id.container), "You have not registered for placement", Snackbar.LENGTH_LONG).show();
                     Log.d("invalid login", responseBody + "ok");
                     signOutFromGplus();
                     Utils.clearpref(getBaseContext());
                     signin.setEnabled(true);
 
-                }
-                else{
+                } else {
                     Snackbar.make((RelativeLayout) findViewById(R.id.container), "Error connecting to server !!", Snackbar.LENGTH_SHORT).show();
                     Log.d("invalid login", responseBody + "ok");
                     signOutFromGplus();

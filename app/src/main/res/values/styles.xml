@@ -24,12 +24,19 @@
     <style name="ThemeOverlay.MyApp.ActionBar" parent="ThemeOverlay.AppCompat.ActionBar">
         <item name="android:textColorPrimary">@color/white</item>
     </style>
+    <style name="BrowseContentButton" parent="Base.V7.Widget.AppCompat.EditText">
+        <item name="android:textColor">@color/colorAccent</item>
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">48dp</item>
+    </style>
+
     <color name="white">#ffffff</color>
 
     <color name="colorPrimary">#3F51B5</color>
     <color name="colorPrimaryDark">#3949AB</color>
     <color name="colorAccent">#FF9800</color>
     <color name="transparent">#00FFFFFF</color>
+    <color name="plus_bg">#df4b38</color>
 
 
 </resources>
