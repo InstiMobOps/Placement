@@ -67,7 +67,7 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
                     mSignInClicked = true;
                     progress = new ProgressDialog(LoginActivity.this);
                     progress.setCancelable(false);
-                    progress.setMessage("Loging In...");
+                    progress.setMessage("Logging In...");
                     progress.show();
                     signin.setEnabled(false);
                     mGoogleApiClient.connect();
@@ -268,7 +268,7 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
         protected void onPostExecute(String s) {
             super.onPostExecute(s);
             if(responseBody==null){
-                Snackbar.make((RelativeLayout) findViewById(R.id.container), "Error connectiong to server !!", Snackbar.LENGTH_SHORT).show();
+                Snackbar.make((RelativeLayout) findViewById(R.id.container), "Error connecting to server !!", Snackbar.LENGTH_SHORT).show();
                 Log.d("invalid login", responseBody + "ok");
                 signOutFromGplus();
                 Utils.clearpref(getBaseContext());
@@ -290,7 +290,7 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
 
                 }
                 else if (responseBody.equals("2")){
-                    Snackbar.make((RelativeLayout) findViewById(R.id.container), "You have not registerd for placement", Snackbar.LENGTH_LONG).show();
+                    Snackbar.make((RelativeLayout) findViewById(R.id.container), "You have not registered for placement", Snackbar.LENGTH_LONG).show();
                     Log.d("invalid login", responseBody + "ok");
                     signOutFromGplus();
                     Utils.clearpref(getBaseContext());
@@ -298,7 +298,7 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
 
                 }
                 else{
-                    Snackbar.make((RelativeLayout) findViewById(R.id.container), "Error connectiong to server !!", Snackbar.LENGTH_SHORT).show();
+                    Snackbar.make((RelativeLayout) findViewById(R.id.container), "Error connecting to server !!", Snackbar.LENGTH_SHORT).show();
                     Log.d("invalid login", responseBody + "ok");
                     signOutFromGplus();
                     Utils.clearpref(getBaseContext());
