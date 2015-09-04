@@ -65,7 +65,7 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
 
     /* Client used to interact with Google APIs. */
     private GoogleApiClient mGoogleApiClient;
-    private boolean mSignInClicked;
+    private boolean mSignInClicked ;
     private boolean mIntentInProgress;
     //RelativeLayout container;
 

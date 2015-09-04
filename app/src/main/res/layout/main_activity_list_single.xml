@@ -1,73 +1,135 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
     xmlns:card_view="http://schemas.android.com/apk/res-auto"
-     android:layout_height="fill_parent"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
     android:orientation="horizontal">
     <!-- A CardView that contains a TextView -->
 
-    <TextView
-        android:id="@+id/date"
-        android:layout_width="wrap_content"
+    <android.support.v7.widget.CardView xmlns:card_view="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/card_view"
+        android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:text="date"
-        android:textStyle="bold|normal"
-        android:layout_marginTop="2dp"
+        android:layout_gravity="center"
+        android:layout_marginBottom="5dp"
         android:layout_marginLeft="10dp"
-        android:layout_weight=".5" />
+        android:layout_marginRight="10dp"
+        android:layout_marginTop="5dp"
+        card_view:cardCornerRadius="2dp">
 
-    <android.support.v7.widget.CardView
-xmlns:card_view="http://schemas.android.com/apk/res-auto"
-android:id="@+id/card_view"
-android:layout_gravity="center"
-android:layout_width="273dp"
-android:layout_height="100dp"
-card_view:cardCornerRadius="2dp"
-    android:layout_marginTop="5dp"
-    android:layout_marginBottom="5dp"
-    android:layout_marginLeft="10dp"
-    android:layout_marginRight="10dp">
         <LinearLayout
-            android:orientation="vertical"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:background="#ff7878">
+            android:orientation="vertical">
 
             <LinearLayout
-                android:orientation="vertical"
                 android:layout_width="fill_parent"
                 android:layout_height="match_parent"
                 android:layout_gravity="center_vertical"
+                android:layout_marginBottom="10dp"
                 android:layout_marginLeft="10dp"
                 android:layout_marginRight="10dp"
                 android:layout_marginTop="10dp"
-                android:layout_marginBottom="10dp">
+                android:orientation="vertical"
+                android:id="@+id/v">
 
                 <TextView
+                    android:id="@+id/name"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Company"
-                    android:id="@+id/name"
-                    android:textStyle="bold|normal"
-                    android:textSize="20dp" />
+                    android:textSize="21dp"
+                    android:textStyle="bold|normal" />
 
-                <TextView
+                <LinearLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="event"
-                    android:id="@+id/event"
-                    android:textStyle="bold"
-                    android:layout_marginLeft="10dp"
-                    android:layout_marginTop="2dp" />
+                    android:orientation="horizontal">
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="10dp"
+                        android:layout_marginTop="2dp"
+                        android:text="Event  :"
+                        android:id="@+id/a" />
+                    <TextView
+                        android:id="@+id/event"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="10dp"
+                        android:layout_marginTop="2dp"
+                        android:text="event"
+                        android:textStyle="bold"
+                        android:textSize="16dp" />
+                </LinearLayout>
 
-                <TextView
+                <LinearLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="venue"
-                    android:id="@+id/venue"
-                    android:textStyle="bold|normal"
-                    android:layout_marginLeft="10dp"
-                    android:layout_marginTop="2dp" />
+                    android:orientation="horizontal">
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="10dp"
+                        android:layout_marginTop="2dp"
+                        android:text="Venue :"
+                        />
+                    <TextView
+                        android:id="@+id/venue"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="10dp"
+                        android:layout_marginTop="2dp"
+                        android:text="venue"
+                        android:textStyle="bold|normal"
+                        android:textSize="16dp" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="10dp"
+                        android:layout_marginTop="2dp"
+                        android:text="Date    :"
+                        android:id="@+id/d" />
+                    <TextView
+                        android:id="@+id/date"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="10dp"
+                        android:layout_marginTop="2dp"
+                        android:layout_weight=".5"
+                        android:text="date"
+                        android:textStyle="bold|normal"
+                        android:textSize="16dp" />
+                </LinearLayout>
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="10dp"
+                        android:layout_marginTop="2dp"
+                        android:text="Time   :"
+                        />
+                    <TextView
+                        android:id="@+id/time"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="10dp"
+                        android:layout_marginTop="2dp"
+                        android:layout_weight=".5"
+                        android:text="date"
+                        android:textStyle="bold|normal"
+                        android:textSize="16dp" />
+                </LinearLayout>
+
             </LinearLayout>
         </LinearLayout>
 

@@ -60,6 +60,7 @@ public class MainActivity extends AppCompatActivity implements AppBarLayout.OnOf
     private static final int PLAY_SERVICES_RESOLUTION_REQUEST = 9000;
     private static final String TAG = "MainActivity";
     ArrayList<Event> arrayList = new ArrayList<>();
+    ArrayList<Event> arrayListOld = new ArrayList<>();
     SwipeRefreshLayout mSwipeRefreshLayout;
     private RecyclerView mRecyclerView;
     private RecyclerView.Adapter mAdapter;
@@ -213,7 +214,7 @@ public class MainActivity extends AppCompatActivity implements AppBarLayout.OnOf
     private void showFilterDialog() {
         new AlertDialog.Builder(this)
                 .setTitle("Filter By")
-                .setSingleChoiceItems(new String[]{"Company", "Event"}, 0, null)
+                .setSingleChoiceItems(new String[]{"Company", "Event","Date"}, 0, null)
                 .setPositiveButton("ok", new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int whichButton) {
 
@@ -223,40 +224,60 @@ public class MainActivity extends AppCompatActivity implements AppBarLayout.OnOf
                                 stockArr = filterList.toArray(stockArr);
                                 dialog.dismiss();
                                 final String[] finalStockArr = stockArr;
-                                String dialogName;
-                                if(selectedPosition==0){
-                                    dialogName="Choose Company";
-                                }else{
-                                    dialogName="Choose Event";
+                                String dialogName = "";
+                                if (selectedPosition == 0) {
+                                    dialogName = "Choose Company";
+                                } else if (selectedPosition == 1) {
+                                    dialogName = "Choose Event";
                                 }
-                                new AlertDialog.Builder(MainActivity.this)
-                                        .setTitle(dialogName)
-                                        .setSingleChoiceItems(stockArr, 0, null)
-                                        .setPositiveButton("ok", new DialogInterface.OnClickListener() {
-                                                    public void onClick(DialogInterface dialog, int whichButton) {
-                                                        ArrayList<Event> secondList = new ArrayList<Event>();
-                                                        int secondPosition = ((AlertDialog) dialog).getListView().getCheckedItemPosition();
-                                                        if (selectedPosition == 0) {
-                                                            for (Event a : arrayList) {
-                                                                if (a.getName().equals(finalStockArr[secondPosition])) {
-                                                                    secondList.add(a);
-                                                                }
-                                                            }
-                                                        } else if (selectedPosition == 1) {
-                                                            for (Event a : arrayList) {
-                                                                if (a.getEvent().equals(finalStockArr[secondPosition])) {
-                                                                    secondList.add(a);
-                                                                }
-                                                            }
+                                if (selectedPosition == 2) {
+                                    new AlertDialog.Builder(MainActivity.this)
+                                            .setTitle(dialogName)
+                                            .setSingleChoiceItems(new String[]{"Comming up", "Old Events"}, 0, null)
+                                            .setPositiveButton("ok", new DialogInterface.OnClickListener() {
+                                                        public void onClick(DialogInterface dialog, int whichButton) {
+                                                            int secondPosition = ((AlertDialog) dialog).getListView().getCheckedItemPosition();
+                                                            if (secondPosition == 0)
+                                                                mAdapter = new AdapterMainActivityRecycler(MainActivity.this, arrayList);
+                                                            else
+                                                                mAdapter = new AdapterMainActivityRecycler(MainActivity.this, arrayListOld);
+                                                            mRecyclerView.setAdapter(mAdapter);
+                                                            dialog.dismiss();
                                                         }
-                                                        mAdapter = new AdapterMainActivityRecycler(MainActivity.this, secondList);
-                                                        mRecyclerView.setAdapter(mAdapter);
-                                                        dialog.dismiss();
                                                     }
-                                                }
 
-                                        )
-                                        .show();
+                                            )
+                                            .show();
+                                } else {
+                                    new AlertDialog.Builder(MainActivity.this)
+                                            .setTitle("Filter By Date")
+                                            .setSingleChoiceItems(stockArr, 0, null)
+                                            .setPositiveButton("ok", new DialogInterface.OnClickListener() {
+                                                        public void onClick(DialogInterface dialog, int whichButton) {
+                                                            ArrayList<Event> secondList = new ArrayList<Event>();
+                                                            int secondPosition = ((AlertDialog) dialog).getListView().getCheckedItemPosition();
+                                                            if (selectedPosition == 0) {
+                                                                for (Event a : arrayList) {
+                                                                    if (a.getName().equals(finalStockArr[secondPosition])) {
+                                                                        secondList.add(a);
+                                                                    }
+                                                                }
+                                                            } else if (selectedPosition == 1) {
+                                                                for (Event a : arrayList) {
+                                                                    if (a.getEvent().equals(finalStockArr[secondPosition])) {
+                                                                        secondList.add(a);
+                                                                    }
+                                                                }
+                                                            }
+                                                            mAdapter = new AdapterMainActivityRecycler(MainActivity.this, secondList);
+                                                            mRecyclerView.setAdapter(mAdapter);
+                                                            dialog.dismiss();
+                                                        }
+                                                    }
+
+                                            )
+                                            .show();
+                                }
                             }
                         }
 
@@ -345,6 +366,7 @@ public class MainActivity extends AppCompatActivity implements AppBarLayout.OnOf
             try {
                 JSONArray jsonArray = new JSONArray(Utils.getprefString("ListData", getBaseContext()));
                 arrayList.clear();
+                arrayListOld.clear();
                 for (int i = 0; i < jsonArray.length(); i++) {
                     JSONObject jo = jsonArray.getJSONObject(i);
                     Date date = null;
@@ -362,8 +384,10 @@ public class MainActivity extends AppCompatActivity implements AppBarLayout.OnOf
                     temp.setName(jo.getString("name"));
                     temp.setDiscription(jo.getString("description"));
                     temp.setFormatedDate(date);
-                    arrayList.add(temp);
-
+                    if(new Date().after(date))
+                        arrayListOld.add(temp);
+                    else
+                        arrayList.add(temp);
                 }
             } catch (JSONException e) {
                 e.printStackTrace();
@@ -454,6 +478,7 @@ public class MainActivity extends AppCompatActivity implements AppBarLayout.OnOf
                 try {
                     jsonArray = new JSONArray(responseBody);
                     arrayList.clear();
+                    arrayListOld.clear();
                     for (int i = 0; i < jsonArray.length(); i++) {
                         JSONObject jo = jsonArray.getJSONObject(i);
                         Date date = null;
@@ -471,7 +496,10 @@ public class MainActivity extends AppCompatActivity implements AppBarLayout.OnOf
                         temp.setName(jo.getString("name"));
                         temp.setDiscription(jo.getString("description"));
                         temp.setFormatedDate(date);
-                        arrayList.add(temp);
+                        if(new Date().after(date))
+                            arrayListOld.add(temp);
+                        else
+                            arrayList.add(temp);
                     }
                 } catch (JSONException e) {
                     e.printStackTrace();

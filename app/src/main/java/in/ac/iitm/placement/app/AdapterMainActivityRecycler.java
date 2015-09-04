@@ -13,6 +13,7 @@ import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.TextView;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 
@@ -50,9 +51,13 @@ public class AdapterMainActivityRecycler extends RecyclerView.Adapter<AdapterMai
         // - get element from your dataset at this position
         // - replace the contents of the view with that element
 //        datePost = Float.toString(date.getTime()) ;
+        SimpleDateFormat Dformatter = new SimpleDateFormat("E, MMM dd, yyyy");
+        SimpleDateFormat Tformatter = new SimpleDateFormat("hh:mm a");
+
         holder.name.setText(mDataset.get(position).getName());
         holder.event.setText(mDataset.get(position).getEvent());
-        holder.date.setText(mDataset.get(position).getDate());
+        holder.date.setText(Dformatter.format(mDataset.get(position).getFormatedDate()));
+        holder.time.setText(Tformatter.format(mDataset.get(position).getFormatedDate()));
         holder.venue.setText(mDataset.get(position).getVenue());
         holder.cardView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -121,13 +126,14 @@ public class AdapterMainActivityRecycler extends RecyclerView.Adapter<AdapterMai
     // you provide access to all the views for a data item in a view holder
     public static class ViewHolder extends RecyclerView.ViewHolder {
         // each data item is just a string in this case
-        public TextView name, date, venue, event;
+        public TextView name, date, venue, event,time;
         public CardView cardView;
 
         public ViewHolder(View v) {
             super(v);
             name = (TextView) v.findViewById(R.id.name);
             date = (TextView) v.findViewById(R.id.date);
+            time = (TextView) v.findViewById(R.id.time);
             venue = (TextView) v.findViewById(R.id.venue);
             event = (TextView) v.findViewById(R.id.event);
             cardView = (CardView) v.findViewById(R.id.card_view);
