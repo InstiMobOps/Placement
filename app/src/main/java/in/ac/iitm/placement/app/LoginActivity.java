@@ -4,16 +4,22 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentSender;
+import android.graphics.Color;
+import android.graphics.Typeface;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.View;
+import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
@@ -72,6 +78,8 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
         ldaplogin = (LinearLayout) findViewById(R.id.ldaplogin);
         username = (EditText) this.findViewById(R.id.rollno);
         password = (EditText) this.findViewById(R.id.password);
+        password.setTypeface(Typeface.DEFAULT_BOLD);
+        username.setTypeface(Typeface.DEFAULT_BOLD);
         // container =(RelativeLayout) findViewById(R.id.container);
         // Button revoke =(Button) findViewById(R.id.revoke);
         ldaplogin.setOnClickListener(new View.OnClickListener() {
@@ -85,11 +93,11 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
                         progress.show();
                         PlacementLdaplogin(getBaseContext());
                     }else {
-                        Snackbar.make((RelativeLayout) findViewById(R.id.container), "No network connection", Snackbar.LENGTH_LONG).show();
+                        MakeSnSnackbar("No internet connection");
                     }
 
                 }else{
-                    Snackbar.make((RelativeLayout) findViewById(R.id.container), "Enter your username and password", Snackbar.LENGTH_LONG).show();
+                    MakeSnSnackbar("Enter your username and password");
                 }
 
             }
@@ -190,7 +198,7 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
             Log.d("rollno", personEmail.substring(0, 2).toLowerCase());
             new PlacementLogin().execute();
         } else {
-            Snackbar.make((RelativeLayout) findViewById(R.id.container), " Account you login with is not smail try again using smail account :)", Snackbar.LENGTH_LONG).show();
+            MakeSnSnackbar("Account you login with is not smail try again using smail account :)");
             signOutFromGplus();
             signin.setEnabled(true);
 
@@ -278,16 +286,16 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
                             Utils.saveprefBool("logedin", true, context);
                             finish();
                         } else if (responseBody.equals("2")) {
-                            Snackbar.make((RelativeLayout) findViewById(R.id.container), "You have not registered for placement", Snackbar.LENGTH_LONG).show();
+                            MakeSnSnackbar("You have not registered for placement yet");
                             Log.d("invalid login", responseBody + "Error connecting to server !!");
                             Utils.clearpref(context);
                         } else if (responseBody.equals("3")) {
-                            Snackbar.make((RelativeLayout) findViewById(R.id.container), "Invalid username or password", Snackbar.LENGTH_LONG).show();
+                            MakeSnSnackbar("Invalid Credentials");
                             Log.d("invalid login", responseBody + "Error connecting to server !!");
                             Utils.clearpref(context);
                         } else {
-                            Snackbar.make((RelativeLayout) findViewById(R.id.container), "Error connecting to server !!", Snackbar.LENGTH_SHORT).show();
-                            Log.d("invalid login", responseBody + "Error connecting to server !!");
+                            MakeSnSnackbar("Error connecting to server !!");
+                          Log.d("invalid login", responseBody + "Error connecting to server !!");
                             Utils.clearpref(context);
                         }
                         progress.dismiss();
@@ -295,7 +303,7 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
                 }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                Snackbar.make((RelativeLayout) findViewById(R.id.container), "Error connecting to server !!", Snackbar.LENGTH_SHORT).show();
+                MakeSnSnackbar("Error connecting to server !!");
                 Log.d("invalid login", error.toString() + "Error connecting to server !!");
                 Utils.clearpref(context);
                 progress.dismiss();
@@ -358,7 +366,7 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
         protected void onPostExecute(String s) {
             super.onPostExecute(s);
             if (responseBody == null) {
-                Snackbar.make((RelativeLayout) findViewById(R.id.container), "Error connecting to server !!", Snackbar.LENGTH_SHORT).show();
+                MakeSnSnackbar("Error connecting to server !!");
                 Log.d("invalid login", responseBody + "ok");
                 signOutFromGplus();
                 Utils.clearpref(getBaseContext());
@@ -378,14 +386,14 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
                     finish();
 
                 } else if (responseBody.equals("2")) {
-                    Snackbar.make((RelativeLayout) findViewById(R.id.container), "You have not registered for placement", Snackbar.LENGTH_LONG).show();
+                    MakeSnSnackbar("You have not registered for placement yet");
                     Log.d("invalid login", responseBody + "ok");
                     signOutFromGplus();
                     Utils.clearpref(getBaseContext());
                     signin.setEnabled(true);
 
                 } else {
-                    Snackbar.make((RelativeLayout) findViewById(R.id.container), "Error connecting to server !!", Snackbar.LENGTH_SHORT).show();
+                    MakeSnSnackbar("Error connecting to server !!");
                     Log.d("invalid login", responseBody + "ok");
                     signOutFromGplus();
                     Utils.clearpref(getBaseContext());
@@ -395,5 +403,27 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
 
         }
     }
-
+    public void MakeSnSnackbar(String text){
+        hideKeyboard();
+        Snackbar snack=Snackbar.make((CoordinatorLayout) findViewById(R.id.container), text, Snackbar.LENGTH_LONG);
+        ViewGroup group = (ViewGroup) snack.getView();
+        group.setBackgroundColor(Color.WHITE);
+        for (int i = 0; i < group.getChildCount(); i++) {
+            View v = group.getChildAt(i);
+            if (v instanceof TextView) {
+                TextView t = (TextView) v;
+                t.setTextColor(Color.RED);
+                t.setTextSize(17);
+            }
+        }
+        snack.show();
+    }
+    private void hideKeyboard() {
+        // Check if no view has focus:
+        View view = this.getCurrentFocus();
+        if (view != null) {
+            InputMethodManager inputManager = (InputMethodManager) this.getSystemService(Context.INPUT_METHOD_SERVICE);
+            inputManager.hideSoftInputFromWindow(view.getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
+        }
+    }
 }

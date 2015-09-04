@@ -485,7 +485,7 @@ public class MainActivity extends AppCompatActivity implements AppBarLayout.OnOf
                     Snackbar.make((CoordinatorLayout) findViewById(R.id.rootview), Integer.toString(arrayList.size() - oldpostnum) + " new events added :)", Snackbar.LENGTH_SHORT).show();
                 }
             } else {
-                Snackbar.make((CoordinatorLayout) findViewById(R.id.rootview), "Error connectiong to server !!", Snackbar.LENGTH_SHORT).show();
+                Snackbar.make((CoordinatorLayout) findViewById(R.id.rootview), "Error connecting to server !!", Snackbar.LENGTH_SHORT).show();
 
             }
             mSwipeRefreshLayout.setRefreshing(false);
