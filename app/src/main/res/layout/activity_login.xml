@@ -163,5 +163,15 @@
         android:textColor="#F5D731"
         android:layout_below="@+id/linearLayout"
         android:layout_centerHorizontal="true" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Use LDAP Crendentials"
+        android:id="@+id/textView3"
+        android:layout_alignTop="@+id/button3"
+        android:layout_alignLeft="@+id/password"
+        android:layout_alignStart="@+id/password"
+        android:textColor="#f4feff" />
 </RelativeLayout>
 </android.support.design.widget.CoordinatorLayout>

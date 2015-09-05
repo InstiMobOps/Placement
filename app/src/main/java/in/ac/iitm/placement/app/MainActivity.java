@@ -7,6 +7,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
@@ -14,6 +15,7 @@ import android.preference.PreferenceManager;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.Snackbar;
+import android.support.design.widget.TabLayout;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AlertDialog;
@@ -60,6 +62,7 @@ public class MainActivity extends AppCompatActivity implements AppBarLayout.OnOf
     private static final int PLAY_SERVICES_RESOLUTION_REQUEST = 9000;
     private static final String TAG = "MainActivity";
     ArrayList<Event> arrayList = new ArrayList<>();
+    ArrayList<Event> arrayListComing = new ArrayList<>();
     ArrayList<Event> arrayListOld = new ArrayList<>();
     SwipeRefreshLayout mSwipeRefreshLayout;
     private RecyclerView mRecyclerView;
@@ -68,7 +71,7 @@ public class MainActivity extends AppCompatActivity implements AppBarLayout.OnOf
     private BroadcastReceiver mRegistrationBroadcastReceiver;
     private Tracker mTracker;
     private AppBarLayout appBarLayout;
-
+    int tabPosition =0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -82,6 +85,34 @@ public class MainActivity extends AppCompatActivity implements AppBarLayout.OnOf
         final Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setTitle(Html.fromHtml("<font color=\"white\">" + getString(R.string.app_name) + "</font>"));
+        TabLayout tabLayout = (TabLayout) findViewById(R.id.tablayout);
+
+        tabLayout.addTab(tabLayout.newTab().setText("Comming Up"));
+        tabLayout.addTab(tabLayout.newTab().setText("Old Events"));
+        tabLayout.setTabTextColors(Color.BLACK,Color.WHITE);
+        tabLayout.setOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
+            @Override
+            public void onTabSelected(TabLayout.Tab tab) {
+                tabPosition = tab.getPosition();
+                    if(tabPosition==0)
+                        arrayList=arrayListComing;
+                    else
+                        arrayList=arrayListOld;
+                    mAdapter = new AdapterMainActivityRecycler(MainActivity.this, arrayList);
+                    mRecyclerView.setAdapter(mAdapter);
+
+            }
+
+            @Override
+            public void onTabUnselected(TabLayout.Tab tab) {
+
+            }
+
+            @Override
+            public void onTabReselected(TabLayout.Tab tab) {
+
+            }
+        });
         mSwipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.activity_main_swipe_refresh_layout);
         mSwipeRefreshLayout.setColorSchemeResources(R.color.colorAccent);
         mSwipeRefreshLayout.setRefreshing(true);
@@ -214,7 +245,7 @@ public class MainActivity extends AppCompatActivity implements AppBarLayout.OnOf
     private void showFilterDialog() {
         new AlertDialog.Builder(this)
                 .setTitle("Filter By")
-                .setSingleChoiceItems(new String[]{"Company", "Event","Date"}, 0, null)
+                .setSingleChoiceItems(new String[]{"Company", "Event"}, 0, null)
                 .setPositiveButton("ok", new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int whichButton) {
 
@@ -230,25 +261,7 @@ public class MainActivity extends AppCompatActivity implements AppBarLayout.OnOf
                                 } else if (selectedPosition == 1) {
                                     dialogName = "Choose Event";
                                 }
-                                if (selectedPosition == 2) {
-                                    new AlertDialog.Builder(MainActivity.this)
-                                            .setTitle(dialogName)
-                                            .setSingleChoiceItems(new String[]{"Comming up", "Old Events"}, 0, null)
-                                            .setPositiveButton("ok", new DialogInterface.OnClickListener() {
-                                                        public void onClick(DialogInterface dialog, int whichButton) {
-                                                            int secondPosition = ((AlertDialog) dialog).getListView().getCheckedItemPosition();
-                                                            if (secondPosition == 0)
-                                                                mAdapter = new AdapterMainActivityRecycler(MainActivity.this, arrayList);
-                                                            else
-                                                                mAdapter = new AdapterMainActivityRecycler(MainActivity.this, arrayListOld);
-                                                            mRecyclerView.setAdapter(mAdapter);
-                                                            dialog.dismiss();
-                                                        }
-                                                    }
 
-                                            )
-                                            .show();
-                                } else {
                                     new AlertDialog.Builder(MainActivity.this)
                                             .setTitle("Filter By Date")
                                             .setSingleChoiceItems(stockArr, 0, null)
@@ -277,7 +290,7 @@ public class MainActivity extends AppCompatActivity implements AppBarLayout.OnOf
 
                                             )
                                             .show();
-                                }
+
                             }
                         }
 
@@ -367,6 +380,7 @@ public class MainActivity extends AppCompatActivity implements AppBarLayout.OnOf
                 JSONArray jsonArray = new JSONArray(Utils.getprefString("ListData", getBaseContext()));
                 arrayList.clear();
                 arrayListOld.clear();
+                arrayListComing.clear();
                 for (int i = 0; i < jsonArray.length(); i++) {
                     JSONObject jo = jsonArray.getJSONObject(i);
                     Date date = null;
@@ -387,11 +401,15 @@ public class MainActivity extends AppCompatActivity implements AppBarLayout.OnOf
                     if(new Date().after(date))
                         arrayListOld.add(temp);
                     else
-                        arrayList.add(temp);
+                        arrayListComing.add(temp);
                 }
             } catch (JSONException e) {
                 e.printStackTrace();
             }
+            if(tabPosition==0)
+                arrayList=arrayListComing;
+            else
+                arrayList=arrayListOld;
             mAdapter = new AdapterMainActivityRecycler(MainActivity.this, arrayList);
             mRecyclerView.setAdapter(mAdapter);
         }
@@ -479,6 +497,8 @@ public class MainActivity extends AppCompatActivity implements AppBarLayout.OnOf
                     jsonArray = new JSONArray(responseBody);
                     arrayList.clear();
                     arrayListOld.clear();
+                    arrayListComing.clear();
+
                     for (int i = 0; i < jsonArray.length(); i++) {
                         JSONObject jo = jsonArray.getJSONObject(i);
                         Date date = null;
@@ -499,11 +519,15 @@ public class MainActivity extends AppCompatActivity implements AppBarLayout.OnOf
                         if(new Date().after(date))
                             arrayListOld.add(temp);
                         else
-                            arrayList.add(temp);
+                            arrayListComing.add(temp);
                     }
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
+                if(tabPosition==0)
+                    arrayList=arrayListComing;
+                else
+                    arrayList=arrayListOld;
                 mAdapter = new AdapterMainActivityRecycler(MainActivity.this, arrayList);
                 mRecyclerView.setAdapter(mAdapter);
                 Utils.saveprefBool("firstload", true, getBaseContext());   // for first loading
