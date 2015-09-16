@@ -7,7 +7,10 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.graphics.Color;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
@@ -28,6 +31,13 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
+
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
 import com.google.android.gms.analytics.GoogleAnalytics;
 import com.google.android.gms.analytics.HitBuilders;
 import com.google.android.gms.analytics.Tracker;
@@ -48,10 +58,10 @@ import org.json.JSONObject;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
 import me.leolin.shortcutbadger.ShortcutBadger;
 
@@ -71,12 +81,13 @@ public class MainActivity extends AppCompatActivity implements AppBarLayout.OnOf
     private BroadcastReceiver mRegistrationBroadcastReceiver;
     private Tracker mTracker;
     private AppBarLayout appBarLayout;
-    int tabPosition =0;
+    int tabPosition = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        Updatecheck(this);
         GoogleAnalytics analytics = GoogleAnalytics.getInstance(this);
         mTracker = analytics.newTracker("UA-66080953-1"); // Send hits to tracker id UA-XXXX-Y
 
@@ -85,21 +96,21 @@ public class MainActivity extends AppCompatActivity implements AppBarLayout.OnOf
         final Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setTitle(Html.fromHtml("<font color=\"white\">" + getString(R.string.app_name) + "</font>"));
-        TabLayout tabLayout = (TabLayout) findViewById(R.id.tablayout);
+        final TabLayout tabLayout = (TabLayout) findViewById(R.id.tablayout);
 
-        tabLayout.addTab(tabLayout.newTab().setText("Comming Up"));
-        tabLayout.addTab(tabLayout.newTab().setText("Old Events"));
-        tabLayout.setTabTextColors(Color.BLACK,Color.WHITE);
+        tabLayout.addTab(tabLayout.newTab().setText("Coming Up"));
+        tabLayout.addTab(tabLayout.newTab().setText("Finished"));
+        tabLayout.setTabTextColors(Color.BLACK, Color.WHITE);
         tabLayout.setOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
                 tabPosition = tab.getPosition();
-                    if(tabPosition==0)
-                        arrayList=arrayListComing;
-                    else
-                        arrayList=arrayListOld;
-                    mAdapter = new AdapterMainActivityRecycler(MainActivity.this, arrayList);
-                    mRecyclerView.setAdapter(mAdapter);
+                if (tabPosition == 0)
+                    arrayList = arrayListComing;
+                else
+                    arrayList = arrayListOld;
+                mAdapter = new AdapterMainActivityRecycler(MainActivity.this, arrayList);
+                mRecyclerView.setAdapter(mAdapter);
 
             }
 
@@ -125,6 +136,7 @@ public class MainActivity extends AppCompatActivity implements AppBarLayout.OnOf
             }
         });
         mRecyclerView = (RecyclerView) findViewById(R.id.my_recycler_view);
+
 
         // use this setting to improve performance if you know that changes
         // in content do not change the layout size of the RecyclerView
@@ -262,34 +274,34 @@ public class MainActivity extends AppCompatActivity implements AppBarLayout.OnOf
                                     dialogName = "Choose Event";
                                 }
 
-                                    new AlertDialog.Builder(MainActivity.this)
-                                            .setTitle("Filter By Date")
-                                            .setSingleChoiceItems(stockArr, 0, null)
-                                            .setPositiveButton("ok", new DialogInterface.OnClickListener() {
-                                                        public void onClick(DialogInterface dialog, int whichButton) {
-                                                            ArrayList<Event> secondList = new ArrayList<Event>();
-                                                            int secondPosition = ((AlertDialog) dialog).getListView().getCheckedItemPosition();
-                                                            if (selectedPosition == 0) {
-                                                                for (Event a : arrayList) {
-                                                                    if (a.getName().equals(finalStockArr[secondPosition])) {
-                                                                        secondList.add(a);
-                                                                    }
-                                                                }
-                                                            } else if (selectedPosition == 1) {
-                                                                for (Event a : arrayList) {
-                                                                    if (a.getEvent().equals(finalStockArr[secondPosition])) {
-                                                                        secondList.add(a);
-                                                                    }
+                                new AlertDialog.Builder(MainActivity.this)
+                                        .setTitle("Filter By Date")
+                                        .setSingleChoiceItems(stockArr, 0, null)
+                                        .setPositiveButton("ok", new DialogInterface.OnClickListener() {
+                                                    public void onClick(DialogInterface dialog, int whichButton) {
+                                                        ArrayList<Event> secondList = new ArrayList<Event>();
+                                                        int secondPosition = ((AlertDialog) dialog).getListView().getCheckedItemPosition();
+                                                        if (selectedPosition == 0) {
+                                                            for (Event a : arrayList) {
+                                                                if (a.getName().equals(finalStockArr[secondPosition])) {
+                                                                    secondList.add(a);
                                                                 }
                                                             }
-                                                            mAdapter = new AdapterMainActivityRecycler(MainActivity.this, secondList);
-                                                            mRecyclerView.setAdapter(mAdapter);
-                                                            dialog.dismiss();
+                                                        } else if (selectedPosition == 1) {
+                                                            for (Event a : arrayList) {
+                                                                if (a.getEvent().equals(finalStockArr[secondPosition])) {
+                                                                    secondList.add(a);
+                                                                }
+                                                            }
                                                         }
+                                                        mAdapter = new AdapterMainActivityRecycler(MainActivity.this, secondList);
+                                                        mRecyclerView.setAdapter(mAdapter);
+                                                        dialog.dismiss();
                                                     }
+                                                }
 
-                                            )
-                                            .show();
+                                        )
+                                        .show();
 
                             }
                         }
@@ -297,32 +309,32 @@ public class MainActivity extends AppCompatActivity implements AppBarLayout.OnOf
                 )
 
 
-                    .setNegativeButton("cancel", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            dialog.dismiss();
-                        }
-                    })
+                .setNegativeButton("cancel", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                })
                 .show();
     }
 
     private ArrayList Filter(int selectedPosition) {
-        int j=0;
-        ArrayList<String> filterList= new ArrayList<>();
-        switch (selectedPosition){
+        int j = 0;
+        ArrayList<String> filterList = new ArrayList<>();
+        switch (selectedPosition) {
             case 0:
-                for(j=0;j<arrayList.size();j++){
-                    String name =arrayList.get(j).getName();
+                for (j = 0; j < arrayList.size(); j++) {
+                    String name = arrayList.get(j).getName();
                     int index = filterList.indexOf(name);
-                    if(index == -1)
+                    if (index == -1)
                         filterList.add(name);
                 }
                 break;
             case 1:
-                for(j=0;j<arrayList.size();j++){
-                    String name =arrayList.get(j).getEvent();
+                for (j = 0; j < arrayList.size(); j++) {
+                    String name = arrayList.get(j).getEvent();
                     int index = filterList.indexOf(name);
-                    if(index == -1)
+                    if (index == -1)
                         filterList.add(name);
 
                 }
@@ -398,7 +410,7 @@ public class MainActivity extends AppCompatActivity implements AppBarLayout.OnOf
                     temp.setName(jo.getString("name"));
                     temp.setDiscription(jo.getString("description"));
                     temp.setFormatedDate(date);
-                    if(new Date().after(date))
+                    if (new Date().after(date))
                         arrayListOld.add(temp);
                     else
                         arrayListComing.add(temp);
@@ -406,10 +418,10 @@ public class MainActivity extends AppCompatActivity implements AppBarLayout.OnOf
             } catch (JSONException e) {
                 e.printStackTrace();
             }
-            if(tabPosition==0)
-                arrayList=arrayListComing;
+            if (tabPosition == 0)
+                arrayList = arrayListComing;
             else
-                arrayList=arrayListOld;
+                arrayList = arrayListOld;
             mAdapter = new AdapterMainActivityRecycler(MainActivity.this, arrayList);
             mRecyclerView.setAdapter(mAdapter);
         }
@@ -516,7 +528,7 @@ public class MainActivity extends AppCompatActivity implements AppBarLayout.OnOf
                         temp.setName(jo.getString("name"));
                         temp.setDiscription(jo.getString("description"));
                         temp.setFormatedDate(date);
-                        if(new Date().after(date))
+                        if (new Date().after(date))
                             arrayListOld.add(temp);
                         else
                             arrayListComing.add(temp);
@@ -524,10 +536,10 @@ public class MainActivity extends AppCompatActivity implements AppBarLayout.OnOf
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
-                if(tabPosition==0)
-                    arrayList=arrayListComing;
+                if (tabPosition == 0)
+                    arrayList = arrayListComing;
                 else
-                    arrayList=arrayListOld;
+                    arrayList = arrayListOld;
                 mAdapter = new AdapterMainActivityRecycler(MainActivity.this, arrayList);
                 mRecyclerView.setAdapter(mAdapter);
                 Utils.saveprefBool("firstload", true, getBaseContext());   // for first loading
@@ -545,6 +557,74 @@ public class MainActivity extends AppCompatActivity implements AppBarLayout.OnOf
 
         }
     }
+    public void openWebPage(String url) {
+        Uri webpage = Uri.parse(url);
+        Intent intent = new Intent(Intent.ACTION_VIEW, webpage);
+        if (intent.resolveActivity(getPackageManager()) != null) {
+            startActivity(intent);
+        }
+    }
+    public void ShowUpdateDiloge(){
+        new AlertDialog.Builder(this)
+                .setTitle("Update")
+                .setMessage("New vertion is available.Do you want to Download")
+                .setPositiveButton("yes", new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int whichButton) {
+                                openWebPage(getString(R.string.updatecheckurl));
+                                dialog.dismiss();
+                            }
+                        }
 
+                )
+                .setNegativeButton("no", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        dialogInterface.dismiss();
 
+                    }
+                })
+                .show();
+    }
+    public void Updatecheck(final Context context){
+
+        String url =context.getString(R.string.updatecheckurl)+"update.php";
+        RequestQueue queue = Volley.newRequestQueue(this);
+        StringRequest stringRequest = new StringRequest(Request.Method.POST, url,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        Log.d("success","fuck this");
+
+                        response = response.replaceAll("\\s", "");
+                        if(response.equals("1")){
+                            ShowUpdateDiloge();
+                        }
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Log.d("server error", error.toString());
+
+            }
+        }){
+            @Override
+            protected Map<String, String> getParams()  {
+                Map<String, String> params = new HashMap<String, String>();
+                params.put("appversion", Integer.toString(getAppVersion(context)));
+                return params;
+            }
+        };
+        queue.add(stringRequest);
+
+    }
+    private static int getAppVersion(Context context) {
+        try {
+            PackageInfo packageInfo = context.getPackageManager()
+                    .getPackageInfo(context.getPackageName(), 0);
+            return packageInfo.versionCode;
+        } catch (PackageManager.NameNotFoundException e) {
+            // should never happen
+            throw new RuntimeException("Could not get package name: " + e);
+        }
+    }
 }

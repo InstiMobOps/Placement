@@ -4,18 +4,19 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:id="@+id/rootview"
-    android:background="#10000bff">
+    android:background="#10000bff"
+    >
     <android.support.v4.widget.SwipeRefreshLayout
         android:id="@+id/activity_main_swipe_refresh_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:layout_behavior="@string/appbar_scrolling_view_behavior"
-        >
-    <android.support.v7.widget.RecyclerView
-        android:id="@+id/my_recycler_view"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-         />
+        android:layout_marginBottom="@dimen/abc_action_bar_default_height_material">
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/my_recycler_view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            />
     </android.support.v4.widget.SwipeRefreshLayout>
 
     <android.support.design.widget.AppBarLayout
