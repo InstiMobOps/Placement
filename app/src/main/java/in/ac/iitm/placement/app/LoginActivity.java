@@ -34,21 +34,7 @@ import com.google.android.gms.common.api.Status;
 import com.google.android.gms.plus.Plus;
 import com.google.android.gms.plus.model.people.Person;
 
-import org.apache.http.HttpResponse;
-import org.apache.http.NameValuePair;
-import org.apache.http.ParseException;
-import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.message.BasicNameValuePair;
-import org.apache.http.util.EntityUtils;
-
-import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 
@@ -68,6 +54,7 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
     private boolean mSignInClicked ;
     private boolean mIntentInProgress;
     //RelativeLayout container;
+    RequestQueue queue = Volley.newRequestQueue(this);
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -196,7 +183,7 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
             Log.d("email", personEmail);
             Log.d("rollno", personEmail.substring(0, 8).toLowerCase());
             Log.d("rollno", personEmail.substring(0, 2).toLowerCase());
-            new PlacementLogin().execute();
+            PlacementLogin();
         } else {
             MakeSnSnackbar("Account you login with is not smail try again using smail account :)");
             signOutFromGplus();
@@ -268,8 +255,7 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
     private void PlacementLdaplogin(final Context context) {
         username = (EditText) this.findViewById(R.id.rollno);
         password = (EditText) this.findViewById(R.id.password);
-        String url = getString(R.string.dominename) + "/mobldaplogin.php";
-        RequestQueue queue = Volley.newRequestQueue(this);
+        String url = getString(R.string.dominename) + "mobldaplogin.php";
         Utils.saveprefString("rollno", username.getText().toString().toLowerCase(), getBaseContext());
         Utils.saveprefString("department", username.getText().toString().substring(0, 2).toLowerCase(), getBaseContext());
         StringRequest stringRequest = new StringRequest(Request.Method.POST, url,
@@ -322,86 +308,74 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
         queue.add(stringRequest);
     }
 
-    private class PlacementLogin extends AsyncTask<String, String, String> {
-        String responseBody;
-        String token;
-        private String resp;
+    public  void PlacementLogin(){
 
-        @Override
-        protected String doInBackground(String... params) {
-            HttpClient httpclient = new DefaultHttpClient();
-            HttpPost httppost = new HttpPost(getString(R.string.dominename) + "/moblogin.php");
-            try {
-                // Add your data
-                List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>(2);
-                nameValuePairs.add(new BasicNameValuePair("rollno", Utils.getprefString("rollno", getBaseContext())));
-                httppost.setEntity(new UrlEncodedFormEntity(nameValuePairs));
-                // Execute HTTP Post Request
-                HttpResponse responseLogin = httpclient.execute(httppost);
-                // Log.d("Parse Exception", "" + "");
+        String url = getString(R.string.dominename) + "/moblogin.php";
+        StringRequest postRequest = new StringRequest(Request.Method.POST, url,
+                new Response.Listener<String>()
+                {
+                    @Override
+                    public void onResponse(String response) {
+                        // response
+                        Log.d("Response", response);
+                        if (response == null) {
+                            MakeSnSnackbar("Error connecting to server !!");
+                            Log.d("invalid login", response + "ok");
+                            signOutFromGplus();
+                            Utils.clearpref(getBaseContext());
+                            signin.setEnabled(true);
+                        } else {
+                            response = response.replaceAll("\\s", "");
+                            // Toast.makeText(getBaseContext(), "lk" + responseBody + "kh", Toast.LENGTH_SHORT).show();
+                            if (response.equals("1")) {
+                                Log.d("valid login", response + "ok");
+                                Intent downloadIntent;
+                                downloadIntent = new Intent(getBaseContext(), MainActivity.class);
+                                startActivity(downloadIntent);
+                                Utils.saveprefBool("logedin", true, getBaseContext());
+                                signOutFromGplus();
 
+                                //Toast.makeText(getBaseContext(), "lk" + responseBody + "kh", Toast.LENGTH_SHORT).show();
+                                finish();
 
-                try {
-                    responseBody = EntityUtils.toString(responseLogin.getEntity());
+                            } else if (response.equals("2")) {
+                                MakeSnSnackbar("You have not registered for placement yet");
+                                Log.d("invalid login", response + "ok");
+                                signOutFromGplus();
+                                Utils.clearpref(getBaseContext());
+                                signin.setEnabled(true);
 
-                } catch (ParseException e) {
-                    e.printStackTrace();
+                            } else {
+                                MakeSnSnackbar("Error connecting to server !!");
+                                Log.d("invalid login", response + "ok");
+                                signOutFromGplus();
+                                Utils.clearpref(getBaseContext());
+                                signin.setEnabled(true);
+                            }
+                        }
 
-                    Log.d("Parse Exception", e + "");
+                    }
+                },
+                new Response.ErrorListener()
+                {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        // error
+                        // Log.d("Error.Response", response);
+                    }
                 }
-            } catch (ClientProtocolException e) {
-                //saveBool("Network_error", true);
+        ) {
+            @Override
+            protected Map<String, String> getParams()
+            {
+                Map<String, String>  params = new HashMap<String, String>();
+                params.put("rollno", Utils.getprefString("rollno", getBaseContext()));
 
-                // TODO Auto-generated catch block
-            } catch (IOException e) {
-                //saveBool("Network_error", true);
-
-                // TODO Auto-generated catch block
+                return params;
             }
+        };
+        queue.add(postRequest);
 
-            return responseBody;
-        }
-
-        @Override
-        protected void onPostExecute(String s) {
-            super.onPostExecute(s);
-            if (responseBody == null) {
-                MakeSnSnackbar("Error connecting to server !!");
-                Log.d("invalid login", responseBody + "ok");
-                signOutFromGplus();
-                Utils.clearpref(getBaseContext());
-                signin.setEnabled(true);
-            } else {
-                responseBody = responseBody.replaceAll("\\s", "");
-                // Toast.makeText(getBaseContext(), "lk" + responseBody + "kh", Toast.LENGTH_SHORT).show();
-                if (responseBody.equals("1")) {
-                    Log.d("valid login", responseBody + "ok");
-                    Intent downloadIntent;
-                    downloadIntent = new Intent(getBaseContext(), MainActivity.class);
-                    startActivity(downloadIntent);
-                    Utils.saveprefBool("logedin", true, getBaseContext());
-                    signOutFromGplus();
-
-                    //Toast.makeText(getBaseContext(), "lk" + responseBody + "kh", Toast.LENGTH_SHORT).show();
-                    finish();
-
-                } else if (responseBody.equals("2")) {
-                    MakeSnSnackbar("You have not registered for placement yet");
-                    Log.d("invalid login", responseBody + "ok");
-                    signOutFromGplus();
-                    Utils.clearpref(getBaseContext());
-                    signin.setEnabled(true);
-
-                } else {
-                    MakeSnSnackbar("Error connecting to server !!");
-                    Log.d("invalid login", responseBody + "ok");
-                    signOutFromGplus();
-                    Utils.clearpref(getBaseContext());
-                    signin.setEnabled(true);
-                }
-            }
-
-        }
     }
     public void MakeSnSnackbar(String text){
         hideKeyboard();

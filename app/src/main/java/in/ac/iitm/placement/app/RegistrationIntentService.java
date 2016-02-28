@@ -12,26 +12,26 @@ import android.preference.PreferenceManager;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
 import com.google.android.gms.gcm.GcmPubSub;
 import com.google.android.gms.gcm.GoogleCloudMessaging;
 import com.google.android.gms.iid.InstanceID;
 
-import org.apache.http.HttpResponse;
-import org.apache.http.NameValuePair;
-import org.apache.http.ParseException;
-import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.message.BasicNameValuePair;
-import org.apache.http.util.EntityUtils;
+
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class RegistrationIntentService extends IntentService {
+    RequestQueue queue = Volley.newRequestQueue(this);
 
     public static final String SENT_TOKEN_TO_SERVER = "sentTokenToServer";
     public static final String REGISTRATION_COMPLETE = "registrationComplete";
@@ -99,7 +99,7 @@ public class RegistrationIntentService extends IntentService {
         Log.d("sdfsdf",token);
         Log.d("last",Utils.getprefString("LastSentToken",getBaseContext()));
         if ((!token.equals(Utils.getprefString("LastSentToken", getBaseContext()))) && Utils.isNetworkAvailable(getBaseContext())) {
-            new Register().execute();
+           Register();
         }
         // Add custom implementation, as needed.
     }
@@ -119,62 +119,49 @@ public class RegistrationIntentService extends IntentService {
     }
 
     // [END subscribe_topics]
-    private class Register extends AsyncTask<String, String, String> {
-        String responseBody;
-        String token;
-        private String resp;
+    public  void Register(){
+        final String token= Utils.getprefString("clintid", getBaseContext());
 
-        @Override
-        protected String doInBackground(String... params) {
-            HttpClient httpclient = new DefaultHttpClient();
-            HttpPost httppost = new HttpPost(getString(R.string.dominename)+"/gcmregister.php");
-            try {
-                // Add your data
-                token = Utils.getprefString("clintid", getBaseContext());
-                List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>(2);
-                nameValuePairs.add(new BasicNameValuePair("gcmid", token));
-                nameValuePairs.add(new BasicNameValuePair("rollno", Utils.getprefString("rollno", getBaseContext())));
-                nameValuePairs.add(new BasicNameValuePair("department", Utils.getprefString("department",getBaseContext())));
-                httppost.setEntity(new UrlEncodedFormEntity(nameValuePairs));
-                // Execute HTTP Post Request
-                HttpResponse responseLogin = httpclient.execute(httppost);
-                // Log.d("Parse Exception", "" + "");
+        String url =getString(R.string.dominename)+"/gcmregister.php";
+        StringRequest postRequest = new StringRequest(Request.Method.POST, url,
+                new Response.Listener<String>()
+                {
+                    @Override
+                    public void onResponse(String response) {
+                        // response
+                        Log.d("Response", response);
+                        String responseBody =response;
+                        responseBody = responseBody.replaceAll("\\s", "");
+                        // Toast.makeText(getBaseContext(), "lk" + responseBody + "kh", Toast.LENGTH_SHORT).show();
+                        if (responseBody.equals("1")||responseBody.equals("2")) {
+                            Log.d("Responce", responseBody + "ok");
 
+                            //Toast.makeText(getBaseContext(), "lk" + responseBody + "kh", Toast.LENGTH_SHORT).show();
+                            Utils.saveprefString("LastSentToken", Utils.getprefString("clintid", getBaseContext()), getBaseContext());
 
-                try {
-                    responseBody = EntityUtils.toString(responseLogin.getEntity());
-
-                } catch (ParseException e) {
-                    e.printStackTrace();
-
-                    Log.d("Parse Exception", e + "");
+                        }
+                    }
+                },
+                new Response.ErrorListener()
+                {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        // error
+                      //  Log.d("Error.Response", response);
+                    }
                 }
-            } catch (ClientProtocolException e) {
-                //saveBool("Network_error", true);
+        ) {
+            @Override
+            protected Map<String, String> getParams()
+            {
+                Map<String, String>  params = new HashMap<String, String>();
+                params.put("gcmid", token);
+                params.put("rollno", Utils.getprefString("rollno", getBaseContext()));
+                params.put("department", Utils.getprefString("department",getBaseContext()));
 
-                // TODO Auto-generated catch block
-            } catch (IOException e) {
-                //saveBool("Network_error", true);
-
-                // TODO Auto-generated catch block
+                return params;
             }
-
-            return responseBody;
-        }
-
-        @Override
-        protected void onPostExecute(String s) {
-            super.onPostExecute(s);
-
-            responseBody = responseBody.replaceAll("\\s", "");
-            // Toast.makeText(getBaseContext(), "lk" + responseBody + "kh", Toast.LENGTH_SHORT).show();
-            if (responseBody.equals("1")||responseBody.equals("2")) {
-                Log.d("Responce", responseBody + "ok");
-
-                //Toast.makeText(getBaseContext(), "lk" + responseBody + "kh", Toast.LENGTH_SHORT).show();
-                Utils.saveprefString("LastSentToken", Utils.getprefString("clintid", getBaseContext()), getBaseContext());
-
-            }
-        }
+        };
+        queue.add(postRequest);
     }
 }

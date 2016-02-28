@@ -44,13 +44,6 @@ import com.google.android.gms.analytics.Tracker;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 
-import org.apache.http.HttpResponse;
-import org.apache.http.ParseException;
-import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.util.EntityUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -74,6 +67,9 @@ public class MainActivity extends AppCompatActivity implements AppBarLayout.OnOf
     ArrayList<Event> arrayList = new ArrayList<>();
     ArrayList<Event> arrayListComing = new ArrayList<>();
     ArrayList<Event> arrayListOld = new ArrayList<>();
+    ArrayList<Event> arrayListNotification = new ArrayList<>();
+    RequestQueue queue = Volley.newRequestQueue(this);
+
     SwipeRefreshLayout mSwipeRefreshLayout;
     private RecyclerView mRecyclerView;
     private RecyclerView.Adapter mAdapter;
@@ -100,6 +96,8 @@ public class MainActivity extends AppCompatActivity implements AppBarLayout.OnOf
 
         tabLayout.addTab(tabLayout.newTab().setText("Coming Up"));
         tabLayout.addTab(tabLayout.newTab().setText("Finished"));
+        tabLayout.addTab(tabLayout.newTab().setText("Notifications"));
+
         tabLayout.setTabTextColors(Color.BLACK, Color.WHITE);
         tabLayout.setOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
@@ -107,8 +105,10 @@ public class MainActivity extends AppCompatActivity implements AppBarLayout.OnOf
                 tabPosition = tab.getPosition();
                 if (tabPosition == 0)
                     arrayList = arrayListComing;
-                else
+                else if (tabPosition == 1)
                     arrayList = arrayListOld;
+                else
+                    arrayList = arrayListNotification;
                 mAdapter = new AdapterMainActivityRecycler(MainActivity.this, arrayList);
                 mRecyclerView.setAdapter(mAdapter);
 
@@ -131,7 +131,7 @@ public class MainActivity extends AppCompatActivity implements AppBarLayout.OnOf
             @Override
             public void onRefresh() {
                 // what should happen when pulled
-                new LoadPosts().execute();
+                LoadPosts();
                 // Snackbar.make((CoordinatorLayout) findViewById(R.id.rootview), "Nothin to refresh :)", Snackbar.LENGTH_SHORT).show();
             }
         });
@@ -149,7 +149,7 @@ public class MainActivity extends AppCompatActivity implements AppBarLayout.OnOf
         Bundle extras = getIntent().getExtras();
         if (extras != null) {
             //String value = extras.getString("new_variable_name");
-            new LoadPosts().execute();
+            LoadPosts();
         }
 
         if (checkPlayServices()) {
@@ -386,13 +386,14 @@ public class MainActivity extends AppCompatActivity implements AppBarLayout.OnOf
     public void Initialize() {
         //mSwipeRefreshLayout.setRefreshing(true);
         if (!Utils.getprefBool("firstload", getBaseContext())) {
-            new LoadPosts().execute();
+            LoadPosts();
         } else {
             try {
                 JSONArray jsonArray = new JSONArray(Utils.getprefString("ListData", getBaseContext()));
                 arrayList.clear();
                 arrayListOld.clear();
                 arrayListComing.clear();
+                arrayListNotification.clear();
                 for (int i = 0; i < jsonArray.length(); i++) {
                     JSONObject jo = jsonArray.getJSONObject(i);
                     Date date = null;
@@ -410,8 +411,14 @@ public class MainActivity extends AppCompatActivity implements AppBarLayout.OnOf
                     temp.setName(jo.getString("name"));
                     temp.setDiscription(jo.getString("description"));
                     temp.setFormatedDate(date);
-                    if (new Date().after(date))
+                    if(temp.getName().equals("")){
+                        arrayListNotification.add(temp);
+                        Log.d("fuck","awsome");
+                    }
+                    else if (new Date().after(date)) {
                         arrayListOld.add(temp);
+                        Log.d("fuck", "asshole");
+                    }
                     else
                         arrayListComing.add(temp);
                 }
@@ -420,8 +427,10 @@ public class MainActivity extends AppCompatActivity implements AppBarLayout.OnOf
             }
             if (tabPosition == 0)
                 arrayList = arrayListComing;
-            else
+            else if (tabPosition == 1)
                 arrayList = arrayListOld;
+            else
+                arrayList=arrayListNotification;
             mAdapter = new AdapterMainActivityRecycler(MainActivity.this, arrayList);
             mRecyclerView.setAdapter(mAdapter);
         }
@@ -450,113 +459,97 @@ public class MainActivity extends AppCompatActivity implements AppBarLayout.OnOf
         }
         return list;
     }
-
-    private class LoadPosts extends AsyncTask<String, String, String> {
-        String responseBody;
-        JSONArray jsonArray;
-
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-            final SwipeRefreshLayout mSwipeRefreshLayout2 = (SwipeRefreshLayout) findViewById(R.id.activity_main_swipe_refresh_layout);
-            if (!mSwipeRefreshLayout2.isRefreshing()) {
-                mSwipeRefreshLayout2.setRefreshing(true);
-                mSwipeRefreshLayout2.setColorSchemeResources(R.color.colorAccent);
-            }
+    public void LoadPosts(){
+        final JSONArray[] jsonArray = new JSONArray[1];
+        final SwipeRefreshLayout mSwipeRefreshLayout2 = (SwipeRefreshLayout) findViewById(R.id.activity_main_swipe_refresh_layout);
+        if (!mSwipeRefreshLayout2.isRefreshing()) {
+            mSwipeRefreshLayout2.setRefreshing(true);
+            mSwipeRefreshLayout2.setColorSchemeResources(R.color.colorAccent);
         }
-
-        @Override
-        protected String doInBackground(String... params) {
-            HttpClient httpclient = new DefaultHttpClient();
-            HttpGet httpget = new HttpGet(getString(R.string.dominename) + "/posts.php?department=" + Utils.getprefString("department", getBaseContext()));
-            try {
-                // Add your data
-                // Execute HTTP Post Request
-                HttpResponse responseLogin = httpclient.execute(httpget);
-                // Log.d("Parse Exception", "" + "");
-
-
-                try {
-                    responseBody = EntityUtils.toString(responseLogin.getEntity());
-
-                } catch (ParseException e) {
-                    e.printStackTrace();
-
-                    Log.d("Parse Exception", e + "");
-                }
-            } catch (ClientProtocolException e) {
-                //saveBool("Network_error", true);
-
-                // TODO Auto-generated catch block
-            } catch (IOException e) {
-                //saveBool("Network_error", true);
-
-                // TODO Auto-generated catch block
-            }
-
-            return responseBody;
-        }
-
-        @Override
-        protected void onPostExecute(String s) {
-            super.onPostExecute(s);
-            int oldpostnum = arrayList.size();
-            if (responseBody != null) {
-                Utils.saveprefInt("NotfCount", 0, getBaseContext());
-                ShortcutBadger.with(getApplicationContext()).count(0);
-                Utils.saveprefString("ListData", responseBody, getBaseContext());
-                try {
-                    jsonArray = new JSONArray(responseBody);
-                    arrayList.clear();
-                    arrayListOld.clear();
-                    arrayListComing.clear();
-
-                    for (int i = 0; i < jsonArray.length(); i++) {
-                        JSONObject jo = jsonArray.getJSONObject(i);
-                        Date date = null;
-                        SimpleDateFormat formatter = new SimpleDateFormat("E, MMM dd, yyyy hh:mm a");
+    String url =getString(R.string.dominename) + "/postsmob.php?department=" + Utils.getprefString("department", getBaseContext());
+    StringRequest postRequest = new StringRequest(Request.Method.GET, url,
+            new Response.Listener<String>()
+            {
+                @Override
+                public void onResponse(String response) {
+                    // response
+                    Log.d("Response", response);
+                    String responseBody=response;
+                    int oldpostnum = arrayList.size();
+                    if (responseBody != null) {
+                        Utils.saveprefInt("NotfCount", 0, getBaseContext());
+                        ShortcutBadger.with(getApplicationContext()).count(0);
+                        Utils.saveprefString("ListData", responseBody, getBaseContext());
                         try {
-                            date = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(jo.getString("event_date"));
+                            jsonArray[0] = new JSONArray(responseBody);
+                            arrayList.clear();
+                            arrayListOld.clear();
+                            arrayListComing.clear();
+                            arrayListNotification.clear();
 
-                        } catch (java.text.ParseException e) {
+                            for (int i = 0; i < jsonArray[0].length(); i++) {
+                                JSONObject jo = jsonArray[0].getJSONObject(i);
+                                Date date = null;
+                                SimpleDateFormat formatter = new SimpleDateFormat("E, MMM dd, yyyy hh:mm a");
+                                try {
+                                    date = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(jo.getString("event_date"));
+
+                                } catch (java.text.ParseException e) {
+                                    e.printStackTrace();
+                                }
+                                Event temp = new Event();
+                                temp.setDate(formatter.format(date));
+                                temp.setEvent(jo.getString("event"));
+                                temp.setVenue(jo.getString("venue"));
+                                temp.setName(jo.getString("name"));
+                                temp.setDiscription(jo.getString("description"));
+                                temp.setFormatedDate(date);
+                                if(temp.getName().equals("")){
+                                    arrayListNotification.add(temp);
+                                    Log.d("fuck","awsome");
+                                }
+                                else if (new Date().after(date)) {
+                                    arrayListOld.add(temp);
+                                    Log.d("fuck", "asshole");
+                                }
+                                else
+                                    arrayListComing.add(temp);
+                            }
+                        } catch (JSONException e) {
                             e.printStackTrace();
                         }
-                        Event temp = new Event();
-                        temp.setDate(formatter.format(date));
-                        temp.setEvent(jo.getString("event"));
-                        temp.setVenue(jo.getString("venue"));
-                        temp.setName(jo.getString("name"));
-                        temp.setDiscription(jo.getString("description"));
-                        temp.setFormatedDate(date);
-                        if (new Date().after(date))
-                            arrayListOld.add(temp);
+                        if (tabPosition == 0)
+                            arrayList = arrayListComing;
+                        else if (tabPosition == 1)
+                            arrayList = arrayListOld;
                         else
-                            arrayListComing.add(temp);
+                            arrayList=arrayListNotification;
+                        mAdapter = new AdapterMainActivityRecycler(MainActivity.this, arrayList);
+                        mRecyclerView.setAdapter(mAdapter);
+                        Utils.saveprefBool("firstload", true, getBaseContext());   // for first loading
+                        if (arrayList.size() == oldpostnum) {
+                            Snackbar.make((CoordinatorLayout) findViewById(R.id.rootview), " Nothing new :)", Snackbar.LENGTH_SHORT).show();
+                        } else {
+                            Snackbar.make((CoordinatorLayout) findViewById(R.id.rootview), Integer.toString(arrayList.size() - oldpostnum) + " new events added :)", Snackbar.LENGTH_SHORT).show();
+                        }
+                    } else {
+                        Snackbar.make((CoordinatorLayout) findViewById(R.id.rootview), "Error connecting to server !!", Snackbar.LENGTH_SHORT).show();
+
                     }
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-                if (tabPosition == 0)
-                    arrayList = arrayListComing;
-                else
-                    arrayList = arrayListOld;
-                mAdapter = new AdapterMainActivityRecycler(MainActivity.this, arrayList);
-                mRecyclerView.setAdapter(mAdapter);
-                Utils.saveprefBool("firstload", true, getBaseContext());   // for first loading
-                if (arrayList.size() == oldpostnum) {
-                    Snackbar.make((CoordinatorLayout) findViewById(R.id.rootview), " Nothing new :)", Snackbar.LENGTH_SHORT).show();
-                } else {
-                    Snackbar.make((CoordinatorLayout) findViewById(R.id.rootview), Integer.toString(arrayList.size() - oldpostnum) + " new events added :)", Snackbar.LENGTH_SHORT).show();
-                }
-            } else {
-                Snackbar.make((CoordinatorLayout) findViewById(R.id.rootview), "Error connecting to server !!", Snackbar.LENGTH_SHORT).show();
+                    mSwipeRefreshLayout.setRefreshing(false);
 
+                }
+            },
+            new Response.ErrorListener()
+            {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+
+                }
             }
-            mSwipeRefreshLayout.setRefreshing(false);
-
-
-        }
-    }
+    ) ;
+    queue.add(postRequest);
+}
     public void openWebPage(String url) {
         Uri webpage = Uri.parse(url);
         Intent intent = new Intent(Intent.ACTION_VIEW, webpage);

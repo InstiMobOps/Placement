@@ -33,102 +33,119 @@
                 android:orientation="vertical"
                 android:id="@+id/v">
 
+
+                <LinearLayout
+                    android:orientation="vertical"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:id="@+id/vcontainer">
+                    <TextView
+                        android:id="@+id/name"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Company"
+                        android:textSize="21dp"
+                        android:textStyle="bold|normal" />
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal">
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginLeft="10dp"
+                            android:layout_marginTop="2dp"
+                            android:text="Event  :"
+                            android:id="@+id/a" />
+                        <TextView
+                            android:id="@+id/event"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginLeft="10dp"
+                            android:layout_marginTop="2dp"
+                            android:text="event"
+                            android:textStyle="bold"
+                            android:textSize="16dp" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal">
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginLeft="10dp"
+                            android:layout_marginTop="2dp"
+                            android:text="Venue :"
+                            />
+                        <TextView
+                            android:id="@+id/venue"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginLeft="10dp"
+                            android:layout_marginTop="2dp"
+                            android:text="venue"
+                            android:textStyle="bold|normal"
+                            android:textSize="16dp" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal">
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginLeft="10dp"
+                            android:layout_marginTop="2dp"
+                            android:text="Date    :"
+                            android:id="@+id/d" />
+                        <TextView
+                            android:id="@+id/date"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginLeft="10dp"
+                            android:layout_marginTop="2dp"
+                            android:layout_weight=".5"
+                            android:text="date"
+                            android:textStyle="bold|normal"
+                            android:textSize="16dp" />
+                    </LinearLayout>
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal">
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginLeft="10dp"
+                            android:layout_marginTop="2dp"
+                            android:text="Time   :"
+                            />
+                        <TextView
+                            android:id="@+id/time"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginLeft="10dp"
+                            android:layout_marginTop="2dp"
+                            android:layout_weight=".5"
+                            android:text="date"
+                            android:textStyle="bold|normal"
+                            android:textSize="16dp" />
+                    </LinearLayout>
+
+                </LinearLayout>
+
                 <TextView
-                    android:id="@+id/name"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Company"
-                    android:textSize="21dp"
-                    android:textStyle="bold|normal" />
 
-                <LinearLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal">
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginLeft="10dp"
-                        android:layout_marginTop="2dp"
-                        android:text="Event  :"
-                        android:id="@+id/a" />
-                    <TextView
-                        android:id="@+id/event"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginLeft="10dp"
-                        android:layout_marginTop="2dp"
-                        android:text="event"
-                        android:textStyle="bold"
-                        android:textSize="16dp" />
-                </LinearLayout>
-
-                <LinearLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal">
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginLeft="10dp"
-                        android:layout_marginTop="2dp"
-                        android:text="Venue :"
-                        />
-                    <TextView
-                        android:id="@+id/venue"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginLeft="10dp"
-                        android:layout_marginTop="2dp"
-                        android:text="venue"
-                        android:textStyle="bold|normal"
-                        android:textSize="16dp" />
-                </LinearLayout>
-
-                <LinearLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal">
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginLeft="10dp"
-                        android:layout_marginTop="2dp"
-                        android:text="Date    :"
-                        android:id="@+id/d" />
-                    <TextView
-                        android:id="@+id/date"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginLeft="10dp"
-                        android:layout_marginTop="2dp"
-                        android:layout_weight=".5"
-                        android:text="date"
-                        android:textStyle="bold|normal"
-                        android:textSize="16dp" />
-                </LinearLayout>
-                <LinearLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal">
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginLeft="10dp"
-                        android:layout_marginTop="2dp"
-                        android:text="Time   :"
-                        />
-                    <TextView
-                        android:id="@+id/time"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginLeft="10dp"
-                        android:layout_marginTop="2dp"
-                        android:layout_weight=".5"
-                        android:text="date"
-                        android:textStyle="bold|normal"
-                        android:textSize="16dp" />
-                </LinearLayout>
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:text="Medium Text"
+                    android:id="@+id/discription"
+                    android:visibility="gone" />
 
             </LinearLayout>
         </LinearLayout>

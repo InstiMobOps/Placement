@@ -11,6 +11,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import java.text.SimpleDateFormat;
@@ -53,18 +54,24 @@ public class AdapterMainActivityRecycler extends RecyclerView.Adapter<AdapterMai
 //        datePost = Float.toString(date.getTime()) ;
         SimpleDateFormat Dformatter = new SimpleDateFormat("E, MMM dd, yyyy");
         SimpleDateFormat Tformatter = new SimpleDateFormat("hh:mm a");
+        if(mDataset.get(position).getName().equals("")){
+            holder.vcontainer.setVisibility(View.GONE);
+            holder.description.setText(mDataset.get(position).getDiscription());
+            holder.description.setVisibility(View.VISIBLE);
 
-        holder.name.setText(mDataset.get(position).getName());
-        holder.event.setText(mDataset.get(position).getEvent());
-        holder.date.setText(Dformatter.format(mDataset.get(position).getFormatedDate()));
-        holder.time.setText(Tformatter.format(mDataset.get(position).getFormatedDate()));
-        holder.venue.setText(mDataset.get(position).getVenue());
-        holder.cardView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                showCustomDialog(mDataset.get(position));
-            }
-        });
+        }else {
+            holder.name.setText(mDataset.get(position).getName());
+            holder.event.setText(mDataset.get(position).getEvent());
+            holder.date.setText(Dformatter.format(mDataset.get(position).getFormatedDate()));
+            holder.time.setText(Tformatter.format(mDataset.get(position).getFormatedDate()));
+            holder.venue.setText(mDataset.get(position).getVenue());
+            holder.cardView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    showCustomDialog(mDataset.get(position));
+                }
+            });
+        }
 
     }
 
@@ -126,8 +133,9 @@ public class AdapterMainActivityRecycler extends RecyclerView.Adapter<AdapterMai
     // you provide access to all the views for a data item in a view holder
     public static class ViewHolder extends RecyclerView.ViewHolder {
         // each data item is just a string in this case
-        public TextView name, date, venue, event,time;
+        public TextView name, date, venue, event,time,description;
         public CardView cardView;
+        public LinearLayout vcontainer;
 
         public ViewHolder(View v) {
             super(v);
@@ -136,7 +144,10 @@ public class AdapterMainActivityRecycler extends RecyclerView.Adapter<AdapterMai
             time = (TextView) v.findViewById(R.id.time);
             venue = (TextView) v.findViewById(R.id.venue);
             event = (TextView) v.findViewById(R.id.event);
+            description = (TextView) v.findViewById(R.id.discription);
+
             cardView = (CardView) v.findViewById(R.id.card_view);
+            vcontainer = (LinearLayout) v.findViewById(R.id.vcontainer);
 
         }
     }
