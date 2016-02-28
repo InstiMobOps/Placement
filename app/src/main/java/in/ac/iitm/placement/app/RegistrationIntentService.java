@@ -31,7 +31,6 @@ import java.util.List;
 import java.util.Map;
 
 public class RegistrationIntentService extends IntentService {
-    RequestQueue queue = Volley.newRequestQueue(this);
 
     public static final String SENT_TOKEN_TO_SERVER = "sentTokenToServer";
     public static final String REGISTRATION_COMPLETE = "registrationComplete";
@@ -120,6 +119,8 @@ public class RegistrationIntentService extends IntentService {
 
     // [END subscribe_topics]
     public  void Register(){
+        RequestQueue queue = Volley.newRequestQueue(this);
+
         final String token= Utils.getprefString("clintid", getBaseContext());
 
         String url =getString(R.string.dominename)+"/gcmregister.php";

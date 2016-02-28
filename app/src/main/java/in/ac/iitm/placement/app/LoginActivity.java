@@ -54,12 +54,12 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
     private boolean mSignInClicked ;
     private boolean mIntentInProgress;
     //RelativeLayout container;
-    RequestQueue queue = Volley.newRequestQueue(this);
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
+
         //getSupportActionBar().hide();
         signin = (LinearLayout) findViewById(R.id.gbutton);
         ldaplogin = (LinearLayout) findViewById(R.id.ldaplogin);
@@ -253,6 +253,8 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
     }
 
     private void PlacementLdaplogin(final Context context) {
+        RequestQueue queue = Volley.newRequestQueue(this);
+
         username = (EditText) this.findViewById(R.id.rollno);
         password = (EditText) this.findViewById(R.id.password);
         String url = getString(R.string.dominename) + "mobldaplogin.php";
@@ -309,6 +311,7 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
     }
 
     public  void PlacementLogin(){
+        RequestQueue queue = Volley.newRequestQueue(this);
 
         String url = getString(R.string.dominename) + "/moblogin.php";
         StringRequest postRequest = new StringRequest(Request.Method.POST, url,

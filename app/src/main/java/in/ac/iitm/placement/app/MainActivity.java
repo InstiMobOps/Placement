@@ -68,7 +68,6 @@ public class MainActivity extends AppCompatActivity implements AppBarLayout.OnOf
     ArrayList<Event> arrayListComing = new ArrayList<>();
     ArrayList<Event> arrayListOld = new ArrayList<>();
     ArrayList<Event> arrayListNotification = new ArrayList<>();
-    RequestQueue queue = Volley.newRequestQueue(this);
 
     SwipeRefreshLayout mSwipeRefreshLayout;
     private RecyclerView mRecyclerView;
@@ -83,7 +82,7 @@ public class MainActivity extends AppCompatActivity implements AppBarLayout.OnOf
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        Updatecheck(this);
+       // Updatecheck(this);
         GoogleAnalytics analytics = GoogleAnalytics.getInstance(this);
         mTracker = analytics.newTracker("UA-66080953-1"); // Send hits to tracker id UA-XXXX-Y
 
@@ -171,7 +170,7 @@ public class MainActivity extends AppCompatActivity implements AppBarLayout.OnOf
                 }
             }
         };
-        appBarLayout = (AppBarLayout) findViewById(R.id.appBarLayout);
+       // appBarLayout = (AppBarLayout) findViewById(R.id.appBarLayout);
 
     }
 
@@ -184,7 +183,7 @@ public class MainActivity extends AppCompatActivity implements AppBarLayout.OnOf
         mTracker.send(new HitBuilders.ScreenViewBuilder().build());
         LocalBroadcastManager.getInstance(this).registerReceiver(mRegistrationBroadcastReceiver,
                 new IntentFilter(REGISTRATION_COMPLETE));
-        appBarLayout.addOnOffsetChangedListener(this);
+       // appBarLayout.addOnOffsetChangedListener(this);
 
     }
 
@@ -192,7 +191,7 @@ public class MainActivity extends AppCompatActivity implements AppBarLayout.OnOf
     protected void onPause() {
         LocalBroadcastManager.getInstance(this).unregisterReceiver(mRegistrationBroadcastReceiver);
         super.onPause();
-        appBarLayout.removeOnOffsetChangedListener(this);
+      //  appBarLayout.removeOnOffsetChangedListener(this);
 
     }
 
@@ -460,6 +459,8 @@ public class MainActivity extends AppCompatActivity implements AppBarLayout.OnOf
         return list;
     }
     public void LoadPosts(){
+        RequestQueue queue = Volley.newRequestQueue(this);
+
         final JSONArray[] jsonArray = new JSONArray[1];
         final SwipeRefreshLayout mSwipeRefreshLayout2 = (SwipeRefreshLayout) findViewById(R.id.activity_main_swipe_refresh_layout);
         if (!mSwipeRefreshLayout2.isRefreshing()) {
